@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Radio</title>
+<style>
+  :root{
+    --bg:#0b0c10;
+    --fg:#f5f5f0;
+    --accent:#e8b34f;
+    --muted:#7a7a72;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding:24px;
+  }
+  .player{
+    text-align:center;
+    max-width:480px;
+    width:100%;
+  }
+  .eyebrow{
+    font-size:13px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:12px;
+  }
+  .title{
+    font-size:28px;
+    font-weight:600;
+    line-height:1.3;
+    margin-bottom:6px;
+    min-height:74px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .meta{
+    font-size:14px;
+    color:var(--muted);
+    margin-bottom:36px;
+  }
+  button.playbtn{
+    width:72px;height:72px;
+    border-radius:50%;
+    border:1px solid rgba(245,245,240,.25);
+    background:transparent;
+    color:var(--fg);
+    font-size:22px;
+    cursor:pointer;
+    transition:background .2s ease, transform .1s ease;
+  }
+  button.playbtn:hover{background:rgba(245,245,240,.08);}
+  button.playbtn:active{transform:scale(.96);}
+  button.playbtn:disabled{opacity:.4;cursor:default;}
+  .status{
+    margin-top:20px;
+    font-size:12px;
+    color:var(--muted);
+    min-height:16px;
+  }
+</style>
+</head>
+<body>
+  <div class="player">
+    <div class="eyebrow">Now Playing</div>
+    <div class="title" id="title">Loading…</div>
+    <div class="meta" id="meta">&nbsp;</div>
+    <button class="playbtn" id="playBtn" aria-label="Play" disabled>&#9654;</button>
+    <div class="status" id="status">&nbsp;</div>
+  </div>
+
+<script>
+(function(){
+  const CROSSFADE_SECONDS = 2;
+
+  const titleEl = document.getElementById('title');
+  const metaEl = document.getElementById('meta');
+  const statusEl = document.getElementById('status');
+  const playBtn = document.getElementById('playBtn');
+
+  let tracks = [];
+  let playOrder = [];
+  let orderIndex = -1;
+  let isPlaying = false;
+  let started = false;
+
+  let audioCtx = null;
+  let players = []; // two {audio, source, gain} objects, alternating
+  let activeIdx = 0;
+  let crossfadeTimer = null;
+
+  // Camelot key like "10B": number 1-12 + mode letter A (minor) / B (major).
+  // Distance = circular distance around the 12-position wheel (0-6),
+  // weighted x2, plus a penalty of 1 if the mode (A/B) differs — a mode
+  // shift is a bigger harmonic/emotional jump than a same-mode neighbor.
+  function camelotDistance(a, b){
+    const numA = parseInt(a.slice(0, -1), 10);
+    const letterA = a.slice(-1);
+    const numB = parseInt(b.slice(0, -1), 10);
+    const letterB = b.slice(-1);
+    const raw = Math.abs(numA - numB);
+    const numDist = Math.min(raw, 12 - raw);
+    const modePenalty = (letterA === letterB) ? 0 : 1;
+    return numDist * 2 + modePenalty;
+  }
+
+  // Greedy walk: from the current track, always jump to the unplayed
+  // track with the largest Camelot distance. Ties broken randomly.
+  function buildGreedyOrder(allTracks, startIdx){
+    const remaining = allTracks.map((_, i) => i).filter(i => i !== startIdx);
+    const order = [startIdx];
+    let current = startIdx;
+    while (remaining.length){
+      let bestDist = -1;
+      let bestCandidates = [];
+      for (const idx of remaining){
+        const d = camelotDistance(allTracks[current].key, allTracks[idx].key);
+        if (d > bestDist){
+          bestDist = d;
+          bestCandidates = [idx];
+        } else if (d === bestDist){
+          bestCandidates.push(idx);
+        }
+      }
+      const pick = bestCandidates[Math.floor(Math.random() * bestCandidates.length)];
+      order.push(pick);
+      remaining.splice(remaining.indexOf(pick), 1);
+      current = pick;
+    }
+    return order;
+  }
+
+  function nextOrderIndex(){
+    orderIndex++;
+    if (orderIndex >= playOrder.length){
+      const startIdx = Math.floor(Math.random() * tracks.length);
+      playOrder = buildGreedyOrder(tracks, startIdx);
+      orderIndex = 0;
+    }
+    return playOrder[orderIndex];
+  }
+
+  function makePlayer(){
+    const audio = new Audio();
+    audio.crossOrigin = 'anonymous';
+    audio.preload = 'auto';
+    const source = audioCtx.createMediaElementSource(audio);
+    const gain = audioCtx.createGain();
+    gain.gain.value = 0;
+    source.connect(gain).connect(audioCtx.destination);
+    return { audio, source, gain };
+  }
+
+  function rampGain(gainNode, from, to, seconds){
+    const now = audioCtx.currentTime;
+    gainNode.gain.cancelScheduledValues(now);
+    gainNode.gain.setValueAtTime(from, now);
+    gainNode.gain.linearRampToValueAtTime(to, now + seconds);
+  }
+
+  function updateDisplay(track){
+    titleEl.textContent = track.title;
+    metaEl.textContent = track.key + ' \u00b7 ' + track.bpm + ' BPM';
+  }
+
+  function playTrackOn(playerIdx, trackIdx, withFadeIn){
+    const track = tracks[trackIdx];
+    const p = players[playerIdx];
+    p.audio.src = track.url;
+    p.audio.currentTime = 0;
+    p.gain.gain.setValueAtTime(withFadeIn ? 0 : 1, audioCtx.currentTime);
+    p.audio.play().catch(function(err){
+      statusEl.textContent = 'Playback error — tap play again.';
+      console.error(err);
+    });
+    if (withFadeIn){
+      rampGain(p.gain, 0, 1, CROSSFADE_SECONDS);
+    }
+    updateDisplay(track);
+  }
+
+  function scheduleCrossfadeWatcher(){
+    if (crossfadeTimer) clearInterval(crossfadeTimer);
+    crossfadeTimer = setInterval(function(){
+      if (!isPlaying) return;
+      const activePlayer = players[activeIdx];
+      const audio = activePlayer.audio;
+      if (!audio.duration || isNaN(audio.duration)) return;
+      const remaining = audio.duration - audio.currentTime;
+      if (remaining <= CROSSFADE_SECONDS && remaining > 0){
+        const outgoingPlayer = activePlayer;
+        const nextIdx = 1 - activeIdx;
+        const nextTrackIdx = nextOrderIndex();
+        rampGain(outgoingPlayer.gain, 1, 0, CROSSFADE_SECONDS);
+        playTrackOn(nextIdx, nextTrackIdx, true);
+        activeIdx = nextIdx;
+        setTimeout(function(){ outgoingPlayer.audio.pause(); }, CROSSFADE_SECONDS * 1000 + 100);
+      }
+    }, 250);
+  }
+
+  async function init(){
+    statusEl.textContent = 'Loading playlist…';
+    try {
+      const res = await fetch('manifest.json', { cache: 'no-store' });
+      const data = await res.json();
+      tracks = data.tracks || [];
+    } catch (err) {
+      titleEl.textContent = 'Could not load playlist';
+      statusEl.textContent = '';
+      console.error(err);
+      return;
+    }
+    if (!tracks.length){
+      titleEl.textContent = 'No tracks found';
+      statusEl.textContent = '';
+      return;
+    }
+    titleEl.textContent = 'Ready';
+    statusEl.textContent = '';
+    playBtn.disabled = false;
+  }
+
+  function startPlayback(){
+    if (started) return;
+    started = true;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    players = [makePlayer(), makePlayer()];
+    activeIdx = 0;
+    const startIdx = Math.floor(Math.random() * tracks.length);
+    playOrder = buildGreedyOrder(tracks, startIdx);
+    orderIndex = 0;
+    isPlaying = true;
+    playTrackOn(0, playOrder[0], false);
+    scheduleCrossfadeWatcher();
+    playBtn.innerHTML = '&#10074;&#10074;';
+    playBtn.setAttribute('aria-label', 'Pause');
+  }
+
+  function togglePlay(){
+    if (!started){
+      startPlayback();
+      return;
+    }
+    if (isPlaying){
+      players[activeIdx].audio.pause();
+      isPlaying = false;
+      playBtn.innerHTML = '&#9654;';
+      playBtn.setAttribute('aria-label', 'Play');
+    } else {
+      players[activeIdx].audio.play();
+      isPlaying = true;
+      playBtn.innerHTML = '&#10074;&#10074;';
+      playBtn.setAttribute('aria-label', 'Pause');
+    }
+  }
+
+  playBtn.addEventListener('click', togglePlay);
+  init();
+})();
+</script>
+</body>
+</html>
