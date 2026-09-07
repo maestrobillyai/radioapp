@@ -1,10 +1,28 @@
 {
   "tracks": [
     {
+      "key": "10A",
+      "bpm": 110,
+      "title": "Event Horizon",
+      "url": "https://files.radioapp.billymello.com/10A%20-%20110%20-%20Event%20Horizon.mp3"
+    },
+    {
+      "key": "10A",
+      "bpm": 154,
+      "title": "Event at the Horizon",
+      "url": "https://files.radioapp.billymello.com/10A%20-%20154%20-%20Event%20at%20the%20Horizon.mp3"
+    },
+    {
       "key": "10B",
       "bpm": 91,
       "title": "Im Gonna Be With Me",
       "url": "https://files.radioapp.billymello.com/10B%20-%2091%20-%20Im%20Gonna%20Be%20With%20Me.mp3"
+    },
+    {
+      "key": "1A",
+      "bpm": 157,
+      "title": "Lounging",
+      "url": "https://files.radioapp.billymello.com/1A%20-%20157%20-%20Lounging.mp3"
     },
     {
       "key": "1A",
@@ -19,10 +37,22 @@
       "url": "https://files.radioapp.billymello.com/1B%20-%2082%20-%20Going%20Drum%20And%20Bass.mp3"
     },
     {
+      "key": "1B",
+      "bpm": 90,
+      "title": "Lounge Dreams",
+      "url": "https://files.radioapp.billymello.com/1B%20-%2090%20-%20Lounge%20Dreams.mp3"
+    },
+    {
       "key": "2A",
       "bpm": 113,
       "title": "Let Them All Go",
       "url": "https://files.radioapp.billymello.com/2A%20-%20113%20-%20Let%20Them%20All%20Go.mp3"
+    },
+    {
+      "key": "2A",
+      "bpm": 128,
+      "title": "Chilling",
+      "url": "https://files.radioapp.billymello.com/2A%20-%20128%20-%20Chilling.mp3"
     },
     {
       "key": "2A",
@@ -44,9 +74,27 @@
     },
     {
       "key": "3A",
+      "bpm": 102,
+      "title": "Electronic and Chill",
+      "url": "https://files.radioapp.billymello.com/3A%20-%20102%20-%20Electronic%20and%20Chill.mp3"
+    },
+    {
+      "key": "3A",
       "bpm": 106,
       "title": "Oh Your Solid Soul",
       "url": "https://files.radioapp.billymello.com/3A%20-%20106%20-%20Oh%20Your%20Solid%20Soul.mp3"
+    },
+    {
+      "key": "3B",
+      "bpm": 124,
+      "title": "Chilling and Lounging",
+      "url": "https://files.radioapp.billymello.com/3B%20-%20124%20-%20Chilling%20and%20Lounging.mp3"
+    },
+    {
+      "key": "3B",
+      "bpm": 86,
+      "title": "Chill And Lounge",
+      "url": "https://files.radioapp.billymello.com/3B%20-%2086%20-%20Chill%20And%20Lounge.mp3"
     },
     {
       "key": "4A",
@@ -71,6 +119,12 @@
       "bpm": 142,
       "title": "Dreaming On Clouds",
       "url": "https://files.radioapp.billymello.com/5B%20-%20142%20-%20Dreaming%20On%20Clouds.mp3"
+    },
+    {
+      "key": "5B",
+      "bpm": 88,
+      "title": "Lounging and in Dreams",
+      "url": "https://files.radioapp.billymello.com/5B%20-%2088%20-%20Lounging%20and%20in%20Dreams.mp3"
     },
     {
       "key": "7A",
