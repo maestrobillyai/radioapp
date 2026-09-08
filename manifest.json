@@ -2,9 +2,21 @@
   "tracks": [
     {
       "key": "10A",
+      "bpm": 100,
+      "title": "Chillout Vibes",
+      "url": "https://files.radioapp.billymello.com/10A%20-%20100%20-%20Chillout%20Vibes.mp3"
+    },
+    {
+      "key": "10A",
       "bpm": 110,
       "title": "Event Horizon",
       "url": "https://files.radioapp.billymello.com/10A%20-%20110%20-%20Event%20Horizon.mp3"
+    },
+    {
+      "key": "10A",
+      "bpm": 118,
+      "title": "Lounge Modelling",
+      "url": "https://files.radioapp.billymello.com/10A%20-%20118%20-%20Lounge%20Modelling.mp3"
     },
     {
       "key": "10A",
@@ -17,6 +29,30 @@
       "bpm": 91,
       "title": "Im Gonna Be With Me",
       "url": "https://files.radioapp.billymello.com/10B%20-%2091%20-%20Im%20Gonna%20Be%20With%20Me.mp3"
+    },
+    {
+      "key": "11A",
+      "bpm": 109,
+      "title": "Atmospheric Lounge",
+      "url": "https://files.radioapp.billymello.com/11A%20-%20109%20-%20Atmospheric%20Lounge.mp3"
+    },
+    {
+      "key": "11A",
+      "bpm": 111,
+      "title": "Lounge Mode",
+      "url": "https://files.radioapp.billymello.com/11A%20-%20111%20-%20Lounge%20Mode.mp3"
+    },
+    {
+      "key": "11A",
+      "bpm": 124,
+      "title": "Chillout Vibing",
+      "url": "https://files.radioapp.billymello.com/11A%20-%20124%20-%20Chillout%20Vibing.mp3"
+    },
+    {
+      "key": "12A",
+      "bpm": 109,
+      "title": "Coastal Dreams",
+      "url": "https://files.radioapp.billymello.com/12A%20-%20109%20-%20Coastal%20Dreams.mp3"
     },
     {
       "key": "1A",
@@ -127,6 +163,12 @@
       "url": "https://files.radioapp.billymello.com/5B%20-%2088%20-%20Lounging%20and%20in%20Dreams.mp3"
     },
     {
+      "key": "6A",
+      "bpm": 105,
+      "title": "Lounge Atmosphere",
+      "url": "https://files.radioapp.billymello.com/6A%20-%20105%20-%20Lounge%20Atmosphere.mp3"
+    },
+    {
       "key": "7A",
       "bpm": 116,
       "title": "Way To Go Techno Toll",
@@ -179,6 +221,12 @@
       "bpm": 113,
       "title": "Jump To The Afro Beat",
       "url": "https://files.radioapp.billymello.com/8A%20-%20113%20-%20Jump%20To%20The%20Afro%20Beat.mp3"
+    },
+    {
+      "key": "8B",
+      "bpm": 98,
+      "title": "Coastal Dreaming",
+      "url": "https://files.radioapp.billymello.com/8B%20-%2098%20-%20Coastal%20Dreaming.mp3"
     },
     {
       "key": "9A",
